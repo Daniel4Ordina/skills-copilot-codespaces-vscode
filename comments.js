@@ -1,27 +1,25 @@
-// Create a web server
-// 1. Use express to create a web server
-// 2. Create a route for GET request to the root URL
-// 3. Send back a response with some HTML
-// 4. Test your work!
+// Create a web server that can respond to requests for /comments.json
+// with a JSON-encoded array of comments, much like your server did in the
+// previous homework.
 
-const express = require('express');
+var http = require('http');
+var fs = require('fs');
+var url = require('url');
+var port = 8080;
 
-const app = express();
+var server = http.createServer(function (req, res) {
+  var path = url.parse(req.url).pathname;
+  var comments = JSON.parse(fs.readFileSync('./comments.json', 'utf8'));
 
-const port = process.env.PORT || 3000;
-
-app.get('', (req, res) => {
-    res.send('<h1>Welcome to my website!</h1>');
+  if (path === '/comments.json') {
+    res.writeHead(200, {'Content-Type': 'application/json'});
+    res.end(JSON.stringify(comments));
+  } else {
+    res.writeHead(404, {'Content-Type': 'text/plain'});
+    res.end('404 Not Found');
+  }
 });
 
-app.get('/about', (req, res) => {
-    res.send('<h1>About</h1>');
-})
-
-app.get('/weather', (req, res) => {
-    res.send('<h1>Weather</h1>');
-})
-
-app.listen(port, () => {
-    console.log('Server is up on port ${port}.');
+server.listen(port, function() {
+  console.log('Listening on port ' + port);
 });
